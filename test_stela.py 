@@ -1,0 +1,38 @@
+"""
+Script de teste para validar o núcleo da Stela Nexus Neural.
+Verifica: Inicialização, Resposta Factual e Memória de Curto Prazo.
+"""
+
+from neural_conversation import NeuralConversation
+
+def testar_stela():
+    print("🧠 Iniciando testes da Stela Nexus Neural...\n")
+    
+    # 1. Teste de Inicialização e Resposta Factual
+    print("TESTE 1: Resposta Factual com Contexto")
+    stela = NeuralConversation(memory_size=3)
+    contexto = "A Stela é uma IA desenvolvida por Alessandro para ser precisa e útil. Ela adora café."
+    
+    resposta = stela.respond("Quem te desenvolveu?", contexto)
+    print(f"Stela diz: {resposta}")
+    
+    if "Alessandro" in resposta:
+        print("✅ PASSOU: A Stela usou o contexto corretamente!\n")
+    else:
+        print("❌ FALHOU: A Stela não encontrou a informação no contexto.\n")
+
+    # 2. Teste de Memória de Curto Prazo
+    print("TESTE 2: Memória de Conversação")
+    stela.respond("Meu nome é Alessandro.", "")  # Primeira interação (sem contexto externo)
+    resposta_memoria = stela.respond("Qual é o meu nome?", "")
+    print(f"Stela diz: {resposta_memoria}")
+    
+    if "Alessandro" in resposta_memoria:
+        print("✅ PASSOU: A Stela lembrou do seu nome!\n")
+    else:
+        print("❌ FALHO: A Stela esqueceu o contexto anterior.\n")
+
+    print(" Testes concluídos!")
+
+if __name__ == "__main__":
+    testar_stela()
