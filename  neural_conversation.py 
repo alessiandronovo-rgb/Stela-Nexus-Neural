@@ -1,0 +1,21 @@
+# Stela Nexus Neural - Conversação Inteligente
+from transformers import pipeline
+
+class NeuralConversation:
+    def __init__(self):
+        # Carrega modelo leve de Q&A para respostas factuais
+        self.qa_pipeline = pipeline("question-answering", model="distilbert-base-cased-distilled-squad")
+        print("Módulo de Conversação Neural Inicializado.")
+
+    def respond(self, question, context):
+        """
+        Responde baseado apenas no contexto fornecido (evita alucinações).
+        """
+        result = self.qa_pipeline(question=question, context=context)
+        return result['answer']
+
+# Teste rápido
+if __name__ == "__main__":
+    stela = NeuralConversation()
+    contexto = "A Stela Nexus Neural é um projeto de IA focado em conversação factual."
+    print(stela.respond("Qual é o foco da Stela?", contexto))
