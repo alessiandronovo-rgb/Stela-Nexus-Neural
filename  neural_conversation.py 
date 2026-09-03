@@ -1,0 +1,52 @@
+# Stela Nexus Neural - Conversação Inteligente com Memória
+from transformers import pipeline
+from collections import deque
+
+class NeuralConversation:
+    def __init__(self, memory_size=5):
+        # Carrega modelo leve de Q&A para respostas factuais
+        self.qa_pipeline = pipeline("question-answering", model="distilbert-base-cased-distilled-squad")
+        # Memória de curto prazo: armazena as últimas N interações
+        self.memory = deque(maxlen=memory_size)
+        print("Módulo de Conversação Neural com Memória Inicializado.")
+
+    def _build_context(self):
+        """Constrói o contexto combinando memória e base de conhecimento."""
+        context_parts = []
+        # Adiciona histórico recente da conversa
+        for entry in self.memory:
+            context_parts.append(f"Usuário: {entry['user']}\nStela: {entry['stela']}")
+        # Junta tudo em um único texto
+        return "\n\n".join(context_parts)
+
+    def respond(self, question, external_context=""):
+        """
+        Responde baseado na memória + contexto externo (evita alucinações).
+        """
+        full_context = self._build_context()
+        if external_context:
+            full_context += f"\n\nInformação adicional: {external_context}"
+        
+        # Se não houver contexto nenhum, retorna aviso
+        if not full_context.strip():
+            return "Ainda não tenho informações suficientes para responder. Pode me dar mais detalhes?"
+            
+        result = self.qa_pipeline(question=question, context=full_context)
+        answer = result['answer']
+        
+        # Salva na memória após responder
+        self.memory.append({"user": question, "stela": answer})
+        return answer
+
+# Teste rápido com memória
+if __name__ == "__main__":
+    stela = NeuralConversation(memory_size=3)
+    
+    # Primeira interação
+    ctx1 = "A Stela Nexus Neural é um projeto de IA focado em conversação factual."
+    resp1 = stela.respond("Qual é o foco da Stela?", ctx1)
+    print(f"Stela: {resp1}")
+    
+    # Segunda interação (ela deve lembrar do contexto anterior)
+    resp2 = stela.respond("E qual biblioteca ela usa para isso?")
+    print(f"Stela: {resp2}")
